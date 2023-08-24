@@ -2,7 +2,10 @@ package com.retooling.chickentestbackend.model;
 
 import javax.persistence.*;
 
+import java.util.*;
+
 @Entity
+@Table(name = "chickens")
 public class Chicken extends Product {
 	
     @Column
@@ -12,16 +15,18 @@ public class Chicken extends Product {
     private int parent_id;
     
     @Column
-    private int days_to_put_eggs;
+    private int days_to_eggs_countdown;
+    
+    @Column
+    private static int days_to_put_eggs = 15;
     
     @Column
     private int age;
-
+    
 	/** Constructor **/
-	public Chicken(float sell_price, int parent_id, int days_to_put_eggs, int age) {
+	public Chicken(double sell_price,  int age) {
 		super(sell_price);
-		this.parent_id = parent_id;
-		this.days_to_put_eggs = days_to_put_eggs;
+		this.days_to_eggs_countdown = days_to_put_eggs;
 		this.age = age;
 	}
 	
@@ -35,16 +40,12 @@ public class Chicken extends Product {
 		this.name = name;
 	}
 
-	public int getParentId() {
-		return parent_id;
-	}
-
-	public int getDaysToPutEggs() {
+	public static int getDaysToPutEggs() {
 		return days_to_put_eggs;
 	}
 
-	public void setDaysToPutEggs(int days_to_put_eggs) {
-		this.days_to_put_eggs = days_to_put_eggs;
+	public int getDaysToEggsCountdown() {
+		return days_to_eggs_countdown;
 	}
 
 	public int getAge() {
@@ -57,9 +58,27 @@ public class Chicken extends Product {
 	
 	@Override
 	public void passADay() {
-		
+		this.days_to_eggs_countdown++;
 	}
-
+	
+	public void hatchEggs(List<Egg> eggs) {
+		for(Egg egg: eggs) {
+			egg.hatch();
+		}
+	}
+	
+	@Override
+	public boolean isDiscountMaterial() {
+		if (age < 4 || getDaysToPutEggs() <= 5) {
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public void setDiscount() {
+		this.setSellPrice(getSellPrice() * 0.7);
+	}
 
 	
     

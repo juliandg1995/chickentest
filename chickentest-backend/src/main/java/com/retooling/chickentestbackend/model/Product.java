@@ -1,18 +1,22 @@
 package com.retooling.chickentestbackend.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Product {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name="id")
 	private int id;
 	
-    @Column
-    private float sell_price;
+    @Column(name="sell_price")
+    private double sell_price;
     
 /****** Constructor ******/
-	public Product(float sell_price) {
+	public Product(double sell_price) {
 		this.sell_price = sell_price;
 	}
 
@@ -22,14 +26,18 @@ public abstract class Product {
 		return id;
 	}
     
-	public float getSell_price() {
+	public double getSellPrice() {
 		return sell_price;
 	}
 
-	public void setSell_price(float sell_price) {
+	public void setSellPrice(double sell_price) {
 		this.sell_price = sell_price;
 	}
 	
 	public abstract void passADay();
+	
+	public abstract boolean isDiscountMaterial();
+	
+	public abstract void setDiscount();
 
 }

@@ -3,54 +3,76 @@ package com.retooling.chickentestbackend.model;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "eggs")
 public class Egg extends Product {
 	
-	@Column
-	private int parent_id;
+	@Column(name="days_to_eclode")
+	private static int daysToEclode = 10;
+
+	@Column(name="countdown")
+	private int chickenCountdown;
 	
-	@Column
-	private int days_to_eclode;
+	@Column(name="isHatched")
+	private boolean isHatched;
+	
+	@Column(name="farmOwner")
+	private Farm farmOwner;
+	
+	@Column(name="ageInDays")
+	private int ageInDays;
 
-	/**
-	 * @param id
-	 * @param sell_price
-	 * @param parent_id
-	 * @param days_to_eclode
-	 */
-	public Egg(float sell_price, int parent_id, int days_to_eclode) {
-		super(sell_price);
-		this.parent_id = parent_id;
-		this.days_to_eclode = days_to_eclode;
+	
+	public Egg(float sellPrice, int parentId) {
+		super(sellPrice);
+		this.chickenCountdown= daysToEclode;
+		isHatched = false;
+		ageInDays = 0;
 	}
 
-	public int getParent_id() {
-		return parent_id;
+	public int getDaysToEclode() {
+		return daysToEclode;
+	}
+	
+	public int getAgeInDays() {
+		return this.ageInDays;
 	}
 
-	public void setParent_id(int parent_id) {
-		this.parent_id = parent_id;
+	public void hatch() {
+		this.isHatched = true;
 	}
-
-	public int getDays_to_eclode() {
-		return days_to_eclode;
+	
+	public boolean isHatched() {
+		return this.isHatched;
 	}
 
 	@Override
-	public void passADay(){
-		this.days_to_eclode = days_to_eclode - 1;
-		if ( days_to_eclode == 0 ){
-			this.eclode(this);
+	public void passADay() {
+		this.ageInDays++;
+		if (isHatched) {
+			this.chickenCountdown-- ;
+			if (chickenCountdown == 0) {
+				this.eclode();
+			}
 		}
 	}
 	
-	private void eclode(Egg thisEgg) {
-		// Acá necesito acceder a la base de datos para buscar el precio y pasarselo al pollo
-		// También necesito definir una constante y acceder a ella (archivo application.properties?)
-		float value = 25.235f;
-		Chicken new_born_chicken = new Chicken(value, thisEgg.getParent_id(), 15, 0);
+	@Override
+	public boolean isDiscountMaterial() {
+		if (isHatched || this.getAgeInDays() < 15) {
+			return false;
+		}
+		return true;
 	}
 	
+	@Override
+	public void setDiscount() {
+		this.setSellPrice(getSellPrice() * 0.5);
+	}
 	
+	// Este metodo lo llama la granja
+	private void eclode() {
+		farmOwner.eggToChicken(this);
+	}
 	
 
 }
